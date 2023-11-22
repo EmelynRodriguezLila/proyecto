@@ -4,20 +4,20 @@ const { request, response } = require('express');
 const conBreaking = require('../models/users')
 const pool = require('../db');
 
-//ENDPOINT PARA VER TODOS LOS DATOS LISTO
+//ENDPOINT PARA VER TODOS LOS DATOS LISTO GET
 const listallB = async (req = request, res = response) => {
     let conn;
 
     try {
         conn = await pool.getConnection();
 
-        const users = await conn.query(conBreaking.getAll, (err) =>{
+        const epi = await conn.query(conBreaking.getAll, (err) =>{
             if(err){
                 throw err
             }
         });
         
-        res.json(users);
+        res.json(epi);
     } catch (error) {
         console.log(error);
         res.status(500).json(error);
@@ -28,7 +28,7 @@ const listallB = async (req = request, res = response) => {
 /////////////////////////////////////////////////////////////////////
 
 
-//ENDPOINT PARA VER UN USUARIO EN ESPECIFICO LISTO
+//ENDPOINT PARA VER UN USUARIO EN ESPECIFICO LISTO GET
 const ListOnly = async (req = request, res = response) => {
     const {id} = req.params;
 
@@ -40,24 +40,24 @@ const ListOnly = async (req = request, res = response) => {
     let conn;
 
     if(!id || id.is_active===0){
-        res.status(404).json({msg: 'Episodio not found'})
+        res.status(404).json({msg: 'Episode not found'})
         return;
     }
 
     try {
         conn = await pool.getConnection();
 
-        const [user] = await conn.query(conBreaking.getByID, [id], (err) =>{
+        const [episode] = await conn.query(conBreaking.getByID, [id], (err) =>{
             if(err){
                 throw err
             }
         });
 
-        if (!user){
+        if (!episode){
             res.status(404).json({msg:'User not found'});
             return;
         }
-        res.json(user);
+        res.json(episode);
     } catch (error) {
         console.log(error);
         res.status(500).json(error);
@@ -67,7 +67,7 @@ const ListOnly = async (req = request, res = response) => {
 }
 
 
-//ENDPOINT PARA AGREGAR UN CAMPO LISTO
+//ENDPOINT PARA AGREGAR UN CAMPO LISTO PUT
 const addEpi = async (req = request, res = response) => {
     const {
         Temporada,
@@ -87,7 +87,7 @@ const addEpi = async (req = request, res = response) => {
         return;
     }
 
-    const user = [Temporada, Episodio, Titulo, Dirijido, Escrito, Duracion, Sipnosis, Rating, Vista,is_active];
+    const episode = [Temporada, Episodio, Titulo, Dirijido, Escrito, Duracion, Sipnosis, Rating, Vista,is_active];
 
     let conn;
 
@@ -95,12 +95,12 @@ const addEpi = async (req = request, res = response) => {
         conn = await pool.getConnection();
 
 
-        const userAdded = await conn.query(conBreaking.addEpisodios, [...user], (err) => {
+        const epiAdded = await conn.query(conBreaking.addEpisodios, [...episode], (err) => {
             if(err) throw err;
         });
 
-        if (userAdded.affecteRows === 0) throw new Error({message: 'Failed to add user'});
-        res.json({msg: 'User added successfully'});
+        if (epiAdded.affecteRows === 0) throw new Error({message: 'Failed to add episode'});
+        res.json({msg: 'Episode added successfully'});
 
     } catch (error){
         console.log(error);
@@ -113,7 +113,7 @@ const addEpi = async (req = request, res = response) => {
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-//ESTE ENDPOINT ES PARA ACTUALIZAR UN CAMPO
+//ESTE ENDPOINT ES PARA ACTUALIZAR UN CAMPO PATCH
 const updateEpi =async (req =request, res= response) =>{
     const {id} = req.params;// Captura el ID de los parámetros en la URL
     const {
@@ -155,7 +155,7 @@ const updateEpi =async (req =request, res= response) =>{
         )
         
         if (!EpiExists || EpiExists.is_active===0) {
-            res.status(404).json({msg: 'User not found'})
+            res.status(404).json({msg: 'Episode not found'})
             return;
         }
 
@@ -185,9 +185,9 @@ const updateEpi =async (req =request, res= response) =>{
                 }
                 )
             if (epiUpdated.affectedRows===0){
-                throw new Error('User not updated');
+                throw new Error('Episode not updated');
             }
-            res.json({msg:'Userd updated successfully'});
+            res.json({msg:'Episode updated successfully'});
     }catch(error){
         console.log(error);
         res.status(500).json(error);
@@ -197,7 +197,7 @@ const updateEpi =async (req =request, res= response) =>{
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////12/10/2023
 
-//END POINT PARA ELIMINAR LISTO 
+//END POINT PARA ELIMINAR LISTO DELETE
 const deleteEpi = async(req = request, res = response) =>{
     let conn;
     const {id} = req.params;
@@ -211,21 +211,21 @@ const deleteEpi = async(req = request, res = response) =>{
             (err) => { throw err; }
         )
         if (!EpiExists || EpiExists.is_active === 0){
-            res.status(404).json({msg: 'User not found'});
+            res.status(404).json({msg: 'Episodio not found'});
             return;
         }
     
         const borrarEpi = await conn.query(
-            conBreaking.deleteRow,
+            conBreaking.deleteEPI,
             [id],
             (err) => {if (err) throw err;}
     
         )
         if(borrarEpi.affecteRows === 0){
-            throw new Error({message: 'Failed to delete user'})
+            throw new Error({message: 'Failed to delete episode'})
         };
 
-        res.json({msg: 'User deleted successfully'});
+        res.json({msg: 'Delete deleted successfully'});
 
     }catch (error){
         console.log(error);

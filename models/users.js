@@ -36,7 +36,7 @@ const conBreaking = {
         WHERE id=?
         `,
 
-    deleteRow: `
+    deleteEPI: `
         UPDATE
             breaking_bad
         SET
